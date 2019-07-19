@@ -1,0 +1,5 @@
+rootProject.name = 'springcloudlearning'
+
+include "discovery"
+include "dicoveryclientdemo"
+

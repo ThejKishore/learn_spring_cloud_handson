@@ -1,0 +1,43 @@
+server:
+  port: 9099
+
+spring:
+  application:
+    name: discoverZuul
+  output:
+    ansi:
+      enabled: always
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+eureka:
+  client:
+    enabled: true
+    register-with-eureka: false
+    fetch-registry: true
+    service-url:
+      default-zone: http://localhost:8761/eureka/
+
+zuul:
+  routes:
+    discovery-client:
+      service-id: discoverClient
+      path: /service/**
+      stripPrefix: true
+
+hystrix:
+  command:
+    discoverClient:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 30000
+    discoverclient:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 30000

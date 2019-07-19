@@ -1,0 +1,8 @@
+spring:
+      output:
+        ansi:
+          enabled: always
+
+logging.level:
+  com.netflix.eureka: debug
+  com.netflix.discovery: debug

@@ -1,0 +1,15 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: discovery
+  security:
+    user:
+      name: user
+      password: password
+      roles: user
+
+  output:
+    ansi:
+      enabled: always
