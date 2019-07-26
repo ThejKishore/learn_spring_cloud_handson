@@ -3,6 +3,16 @@ spring:
         ansi:
           enabled: always
 
+
 logging.level:
   com.netflix.eureka: debug
   com.netflix.discovery: debug
+
+management.endpoints.web.exposure.include: "*"
+
+server.ssl:
+  key-alias: selfsigned_localhost_sslserver
+  key-password: changeit
+  key-store: classpath:ssl-server.jks
+  key-store-provider: SUN
+  key-store-type: JKS
