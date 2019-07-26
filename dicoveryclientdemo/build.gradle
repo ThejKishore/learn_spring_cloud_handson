@@ -1,17 +1,11 @@
 plugins {
     id 'org.springframework.boot' version '2.1.5.RELEASE'
     id 'java'
-    id 'com.bmuschko.docker-remote-api' version '3.5.0'
 }
 
-import com.bmuschko.gradle.docker.tasks.image.Dockerfile
-import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 
 apply plugin: 'io.spring.dependency-management'
 
-group = 'com.kish.learning'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '1.8'
 
 configurations {
     developmentOnly
@@ -64,32 +58,5 @@ String getConfigurationProperty(String envVar, String sysProp) {
 }
 */
 
-/**
- * needed in mac to work
- */
-task dockerCopy(type: Copy){
-    into "${buildDir}/docker/libs"
-    from "${buildDir}/libs"
-}
 
-task createDockerfile(type: Dockerfile) {
-    destFile = project.file('build/docker/Dockerfile')
-    from 'openjdk:8-jre-alpine'
-    maintainer 'Thej Kishore "kishores1984@gmail.com"'
-    workingDir("/app")
-    copyFile "libs/${jar.baseName}-${jar.version}.jar" , "/app/${jar.baseName}-${jar.version}.jar"
-    entryPoint "java"
-    defaultCommand "-jar", "/app/${jar.baseName}-${jar.version}.jar"
-    exposePort 8080
-    runCommand 'apk --update --no-cache add curl'
-    instruction 'HEALTHCHECK CMD curl -f http://localhost:8080/health || exit 1'
-}
-
-task buildImage(type: DockerBuildImage) {
-    dependsOn createDockerfile
-    inputDir = createDockerfile.destFile.parentFile
-    tag = "thej/discoverclientdemo:$jar.version"
-}
-
-createDockerfile.dependsOn assemble,dockerCopy
 

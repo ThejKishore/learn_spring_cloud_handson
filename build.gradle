@@ -1,35 +1,71 @@
-
-allprojects {
-    group 'com.kish.learning'
-    version '1.0-SNAPSHOT'
-
-    repositories {
-        mavenCentral()
-        jcenter()
-    }
-
+plugins {
+    id "io.spring.dependency-management" version "1.0.6.RELEASE"
+    id 'com.bmuschko.docker-remote-api' version '3.5.0'
 }
+
+import com.bmuschko.gradle.docker.tasks.image.Dockerfile
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+
 subprojects {
-    plugins {
-        id 'org.springframework.boot' version '2.1.5.RELEASE'
-        id 'java'
-        id 'com.bmuschko.docker-remote-api' version '3.5.0'
-    }
-
-
-    apply plugin: 'io.spring.dependency-management'
 
 
     group = 'com.kish.learning'
     version = '0.0.1-SNAPSHOT'
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'java-library'
+    apply plugin: 'com.bmuschko.docker-remote-api'
+
     sourceCompatibility = '1.8'
 
-
     repositories {
-        mavenCentral()
         jcenter()
     }
-    dependencies {
-        testCompile group: 'junit', name: 'junit', version: '4.12'
+
+   /* dependencies{
+        testImplementation "junit:junit:4.1.5"
+    }*/
+
+    dependencyManagement {
+        imports {
+            mavenBom("org.springframework.boot:spring-boot-dependencies:2.1.5.RELEASE")
+        }
     }
+
+
+
+
+    afterEvaluate { Project project ->
+        /**
+         * needed in mac to work
+         */
+        task dockerCopy(type: Copy){
+            into "${buildDir}/docker/libs"
+            from "${buildDir}/libs"
+        }
+
+        task createDockerfile(type: Dockerfile) {
+            destFile = project.file('build/docker/Dockerfile')
+            from 'openjdk:8-jre-alpine'
+            maintainer 'Thej Kishore "kishores1984@gmail.com"'
+            workingDir("/app")
+            copyFile "libs/${jar.baseName}-${jar.version}.jar" , "/app/${jar.baseName}-${jar.version}.jar"
+            entryPoint "java"
+            defaultCommand "-jar", "/app/${jar.baseName}-${jar.version}.jar"
+            exposePort 8080
+            runCommand 'apk --update --no-cache add curl'
+            instruction 'HEALTHCHECK CMD curl -f http://localhost:8080/health || exit 1'
+        }
+
+        task buildImage(type: DockerBuildImage) {
+            dependsOn createDockerfile
+            inputDir = createDockerfile.destFile.parentFile
+            tag = "thej/${jar.baseName}:$jar.version"
+        }
+
+        createDockerfile.dependsOn assemble,dockerCopy
+    }
+
 }

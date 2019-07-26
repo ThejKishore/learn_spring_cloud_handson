@@ -1,5 +1,12 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+    }
+}
 rootProject.name = 'springcloudlearning'
 
 include "discovery"
 include "dicoveryclientdemo"
+include "discoverzuul"
+include "adminbootserver"
 
