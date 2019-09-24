@@ -1,14 +1,16 @@
 spring:
-      output:
-        ansi:
-          enabled: always
+  output:
+    ansi:
+      enabled: always
 
+#server:
+#  servlet:
+#    context-path: /test
 
 logging.level:
   com.netflix.eureka: debug
   com.netflix.discovery: debug
 
-management.endpoints.web.exposure.include: "*"
 
 server.ssl:
   key-alias: selfsigned_localhost_sslserver
@@ -16,3 +18,28 @@ server.ssl:
   key-store: classpath:ssl-server.jks
   key-store-provider: SUN
   key-store-type: JKS
+
+
+management:
+  endpoints:
+    web:
+      base-path: /admin
+      exposure:
+        include: "*"
+
+
+  metrics:
+    use-global-registry: true
+    tags:
+      - instance: ${eureka.instance.metadata-map.instanceId}
+
+
+eureka:
+  instance:
+    secure-port-enabled: true
+    secure-port: ${server.port}
+    health-check-url-path: /health
+    status-page-url-path: ${management.endpoints.web.base-path}/info
+    metadata-map:
+      management.context-path: ${management.endpoints.web.base-path}
+
